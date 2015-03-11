@@ -80,6 +80,7 @@
 #define OPT_AUTO_SHOW_INTERSTITIAL  @"autoShowInterstitial"
 #define OPT_TAPPX_ID_IOS            @"tappxIdiOS"
 #define OPT_TAPPX_SHARE             @"tappxShare"
+#define OPT_CUSTOM_BANNER_SIZE_PC   @"customBannerSizeInPercent"
 
 @synthesize isInterstitialAvailable;
 
@@ -91,6 +92,7 @@
 @synthesize publisherId, interstitialAdId, tappxId, adSize, tappxShare;
 @synthesize isBannerAtTop, isBannerOverlap, isOffsetStatusBar;
 @synthesize isTesting, adExtras;
+@synthesize customBannerSizeInPercent;
 
 @synthesize isBannerVisible, isBannerInitialized, isBannerRequested, isInterstitialRequested, isNetworkActive;
 @synthesize isBannerShow, isBannerAutoShow, isInterstitialAutoShow, hasTappx, isGo2TappxInInterstitialBackfill, isGo2TappxInBannerBackfill;
@@ -609,6 +611,33 @@
         tappxShare = [str doubleValue];
         hasTappx = true;
     }
+    
+    dict = [options objectForKey:OPT_CUSTOM_BANNER_SIZE_PC];
+    if (dict) {
+        CGFloat x, y, width, height;
+        x = y = width = height = 0;
+        // x
+        str = [dict objectForKey:@"x"];
+        if (str) {
+            x = [str doubleValue];
+        }
+        // y
+        str = [dict objectForKey:@"y"];
+        if (str) {
+            y = [str doubleValue];
+        }
+        // width
+        str = [dict objectForKey:@"width"];
+        if (str) {
+            width = [str doubleValue];
+        }
+        // height
+        str = [dict objectForKey:@"height"];
+        if (str) {
+            height = [str doubleValue];
+        }
+        customBannerSizeInPercent = CGRectMake(x, y, width, height );
+    }
 }
 
 - (BOOL) __createBanner:(NSString *)_pid withAdListener:(CDVAdMobAdsAdListener *)adListener isTappx:(BOOL)isTappx andIsBackFill:(BOOL)isBackFill {
@@ -896,7 +925,17 @@
                 wf.size.height -= bf.size.height;
             }
             
+            // center banner (default)
             bf.origin.x = (pr.size.width - bf.size.width) * 0.5f;
+            
+            // apply size in percent if customBannerSizeInPercent is set
+            if( !CGRectIsEmpty(customBannerSizeInPercent))
+            {
+                bf.origin.x = pr.size.width * customBannerSizeInPercent.origin.x / 100;
+                bf.origin.y = pr.size.height * customBannerSizeInPercent.origin.y / 100;
+                bf.size.width = pr.size.width * customBannerSizeInPercent.size.width / 100;
+                bf.size.height = pr.size.height * customBannerSizeInPercent.size.height / 100;
+            }
             
             self.bannerView.frame = bf;
             

@@ -14,6 +14,18 @@ Or
 
 ![Integrate cordova admob plugin](https://github.com/appfeel/admob-google-cordova/blob/master/demo/integrate-admob-cordova.gif)
 
+---
+## What´s new in this fork? ##
+Added a new option which allows to set the position and size of the AdView (in percent of the parent view).
+Currently this feature is iOS only (no Android support yet).
+```javascript
+  // Set AdMobAds options:
+  admob.setOptions({
+    publisherId:          "ca-app-pub-XXXXXXXXXXXXXXXX/BBBBBBBBBB",  // Required
+    interstitialAdId:     "ca-app-pub-XXXXXXXXXXXXXXXX/IIIIIIIIII",  // Optional
+    customBannerSizeInPercent: { x: 10, y: 10, width: 80, height: 80 } // Optional, NEW
+  });
+```
 
 ---
 ## Testimonials ##

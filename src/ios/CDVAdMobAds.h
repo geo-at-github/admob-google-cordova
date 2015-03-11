@@ -75,6 +75,7 @@
 @property (assign) BOOL isGo2TappxInBannerBackfill;
 @property (assign) BOOL hasTappx;
 @property (assign) double tappxShare;
+@property (assign) CGRect customBannerSizeInPercent;
 
 - (void)setOptions:(CDVInvokedUrlCommand *)command;
 
