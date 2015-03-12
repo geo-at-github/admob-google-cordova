@@ -91,4 +91,7 @@
 - (void)tryToBackfillBannerAd;
 - (void)tryToBackfillInterstitialAd;
 
+- (void)hideBannerView:(CDVInvokedUrlCommand *)command;
+- (void)showBannerView:(CDVInvokedUrlCommand *)command;
+
 @end

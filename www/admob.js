@@ -148,6 +148,24 @@ admob.destroyBannerView = function (successCallback, failureCallback) {
 };
 
 /**
+ * Hides the banner view.
+ * @param {function()} successCallback The function to call if the view was destroyed successfully.
+ * @param {function()} failureCallback The function to call if failed to destroy view.
+ */
+admob.hideBannerView = function (successCallback, failureCallback) {
+    cordova.exec(successCallback, failureCallback, 'AdMobAds', 'hideBannerView', []);
+};
+
+/**
+ * Show the banner view.
+ * @param {function()} successCallback The function to call if the view was destroyed successfully.
+ * @param {function()} failureCallback The function to call if failed to destroy view.
+ */
+admob.showBannerView = function (successCallback, failureCallback) {
+    cordova.exec(successCallback, failureCallback, 'AdMobAds', 'showBannerView', []);
+};
+
+/**
  * Request an AdMob interstitial ad.
  *
  * @param {!Object}    options         The options used to request an ad. (use admob.options as template)

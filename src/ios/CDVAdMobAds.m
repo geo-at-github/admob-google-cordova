@@ -424,6 +424,36 @@
     }];
 }
 
+- (void)hideBannerView:(CDVInvokedUrlCommand *)command {
+    NSString *callbackId = command.callbackId;
+
+    [self.commandDelegate runInBackground:^{
+        CDVPluginResult *pluginResult;
+        if (self.bannerView) {
+            self.bannerView.hidden = true;
+        }
+
+        // Call the success callback that was passed in through the javascript.
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    }];
+}
+
+- (void)showBannerView:(CDVInvokedUrlCommand *)command {
+    NSString *callbackId = command.callbackId;
+
+    [self.commandDelegate runInBackground:^{
+        CDVPluginResult *pluginResult;
+        if (self.bannerView) {
+            self.bannerView.hidden = false;
+        }
+
+        // Call the success callback that was passed in through the javascript.
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    }];
+}
+
 - (GADAdSize)__adSizeFromString:(NSString *)string {
     if ([string isEqualToString:@"BANNER"]) {
         return kGADAdSizeBanner;

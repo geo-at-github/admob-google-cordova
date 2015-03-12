@@ -107,6 +107,16 @@ if (typeof angular !== 'undefined') {
           return makePromise(admob.destroyBannerView, []);
         });
       },
+      hideBannerView: function () {
+          return deviceready.promise.then(function () {
+              return makePromise(admob.hideBannerView, []);
+          });
+      },
+      showBannerView: function () {
+          return deviceready.promise.then(function () {
+              return makePromise(admob.showBannerView, []);
+          });
+      },
       requestInterstitialAd: function (options) {
         return deviceready.promise.then(function () {
           return makePromise(admob.requestInterstitialAd, [options]);
