@@ -430,7 +430,9 @@
     [self.commandDelegate runInBackground:^{
         CDVPluginResult *pluginResult;
         if (self.bannerView) {
-            self.bannerView.hidden = true;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.bannerView setHidden:YES];
+            });
         }
 
         // Call the success callback that was passed in through the javascript.
@@ -445,7 +447,9 @@
     [self.commandDelegate runInBackground:^{
         CDVPluginResult *pluginResult;
         if (self.bannerView) {
-            self.bannerView.hidden = false;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.bannerView setHidden:NO];
+            });
         }
 
         // Call the success callback that was passed in through the javascript.
