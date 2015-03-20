@@ -80,6 +80,8 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
   private static final String ACTION_SHOW_INTERSTITIAL_AD = "showInterstitialAd";
   private static final String ACTION_RECORD_RESOLUTION = "recordResolution";
   private static final String ACTION_RECORD_PLAY_BILLING_RESOLUTION = "recordPlayBillingResolution";
+  private static final String ACTION_HIDE_BANNER_VIEW = "hideBannerView";
+  private static final String ACTION_SHOW_BANNER_VIEW = "showBannerView";
 
   /* options */
   private static final String OPT_PUBLISHER_ID = "publisherId";
@@ -94,6 +96,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
   private static final String OPT_AUTO_SHOW_INTERSTITIAL = "autoShowInterstitial";
   private static final String OPT_TAPPX_ID_ANDROID = "tappxIdAndroid";
   private static final String OPT_TAPPX_SHARE = "tappxShare";
+  private static final String OPT_CUSTOM_BANNER_SIZE_PC = "customBannerSizeInPercent";
 
   private Connectivity connectivity;
   private AdMobAdsAdListener bannerListener = new AdMobAdsAdListener(BANNER, this, false);
@@ -138,6 +141,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
   private boolean isGo2TappxInBannerBackfill = false;
   private boolean isGo2TappxInIntesrtitialBackfill = false;
   private boolean hasTappx = false;
+  private Rect customBannerSizeInPercent = null;
 
   @Override
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -195,6 +199,12 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
       int purchaseId = args.getInt(0);
       int billingResponseCode = args.getInt(1);
       result = executeRecordPlayBillingResolution(purchaseId, billingResponseCode, callbackContext);
+
+    } else if (ACTION_HIDE_BANNER_VIEW.equals(action)) {
+      result = executeHideBannerView(callbackContext);
+
+    } else if (ACTION_SHOW_BANNER_VIEW.equals(action)) {
+      result = executeShowBannerView(callbackContext);
 
     } else {
       Log.d(ADMOBADS_LOGTAG, String.format("Invalid action passed: %s", action));
@@ -256,6 +266,35 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     if (options.has(OPT_TAPPX_SHARE)) {
       this.tappxShare = options.optDouble(OPT_TAPPX_SHARE);
       hasTappx = true;
+    }
+    if( options.has(OPT_CUSTOM_BANNER_SIZE_PC) )
+    {
+        JSONObject obj = options.optJSONObject(OPT_CUSTOM_BANNER_SIZE_PC);
+        if( obj != null )
+        {
+            int x, y, width, height;
+            x = y = width = height = 0;
+            try
+            {
+                if( obj.has("x") )
+                {
+                    x = (int) Math.round(obj.getDouble("x"));
+                }
+                if( obj.has("y") )
+                {
+                    y = (int) Math.round(obj.getDouble("y"));
+                }
+                if( obj.has("width") )
+                {
+                    width = (int) Math.round(obj.getDouble("width"));
+                }
+                if( obj.has("height") )
+                {
+                    height = (int) Math.round(obj.getDouble("height"));
+                }
+            } catch( JSONException e){}
+            this.customBannerSizeInPercent = new Rect( x, y, width, height );
+        }
     }
   }
 
@@ -462,6 +501,36 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
         }
         isBannerVisible = false;
         isBannerRequested = false;
+        delayCallback.success();
+      }
+    });
+    return null;
+  }
+
+  private PluginResult executeHideBannerView(CallbackContext callbackContext) {
+    Log.w(ADMOBADS_LOGTAG, "executeHideBannerView");
+    final CallbackContext delayCallback = callbackContext;
+    cordova.getActivity().runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if (adView != null) {
+          adView.setVisibility(View.INVISIBLE);
+        }
+        delayCallback.success();
+      }
+    });
+    return null;
+  }
+
+  private PluginResult executeShowBannerView(CallbackContext callbackContext) {
+    Log.w(ADMOBADS_LOGTAG, "executeShowBannerView");
+    final CallbackContext delayCallback = callbackContext;
+    cordova.getActivity().runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        if (adView != null) {
+          adView.setVisibility(View.VISIBLE);
+        }
         delayCallback.success();
       }
     });
