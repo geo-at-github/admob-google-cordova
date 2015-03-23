@@ -17,7 +17,7 @@ Or
 ---
 ## What´s new in this fork? ##
 Added a new option which allows to set the position and size of the AdView (in percent of the parent view).
-Currently this feature is iOS only (no Android support yet).
+Currently this feature is supported on iOS and Android.
 ```javascript
   // Set AdMobAds options:
   admob.setOptions({
