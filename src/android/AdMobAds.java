@@ -44,6 +44,7 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
@@ -71,7 +72,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
   private static final String DEFAULT_INTERSTITIAL_PUBLISHER_ID = "ca-app-pub-8440343014846849/4596573817";
   private static final String DEFAULT_TAPPX_ID = "/120940746/Pub-2700-Android-8171";
 
-  /* Cordova Actions */
+  /* Cordova Actions. */
   private static final String ACTION_SET_OPTIONS = "setOptions";
   private static final String ACTION_CREATE_BANNER_VIEW = "createBannerView";
   private static final String ACTION_SHOW_BANNER_AD = "showBannerAd";
@@ -141,7 +142,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
   private boolean isGo2TappxInBannerBackfill = false;
   private boolean isGo2TappxInIntesrtitialBackfill = false;
   private boolean hasTappx = false;
-  private Rect customBannerSizeInPercent = null;
+  private RectF customBannerSizeInPercent = null;
 
   @Override
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -272,28 +273,28 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
         JSONObject obj = options.optJSONObject(OPT_CUSTOM_BANNER_SIZE_PC);
         if( obj != null )
         {
-            int x, y, width, height;
-            x = y = width = height = 0;
+            float x, y, width, height;
+            x = y = width = height = 0.0f;
             try
             {
                 if( obj.has("x") )
                 {
-                    x = (int) Math.round(obj.getDouble("x"));
+                    x = (float) obj.getDouble("x");
                 }
                 if( obj.has("y") )
                 {
-                    y = (int) Math.round(obj.getDouble("y"));
+                    y = (float) obj.getDouble("y");
                 }
                 if( obj.has("width") )
                 {
-                    width = (int) Math.round(obj.getDouble("width"));
+                    width = (float) obj.getDouble("width");
                 }
                 if( obj.has("height") )
                 {
-                    height = (int) Math.round(obj.getDouble("height"));
+                    height = (float) obj.getDouble("height");
                 }
             } catch( JSONException e){}
-            this.customBannerSizeInPercent = new Rect( x, y, width, height );
+            this.customBannerSizeInPercent = new RectF( x, y, x + width, y + height );
         }
     }
   }
@@ -365,7 +366,8 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
     }
     if (adViewLayout == null) {
       adViewLayout = new RelativeLayout(cordova.getActivity());
-      RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+      RelativeLayout.LayoutParams params;
+      params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
       webView.addView(adViewLayout, params);
     }
     isBannerVisible = false;
@@ -426,6 +428,7 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
           }
 
           if (isBannerOverlap) {
+
             RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
             if (isOffsetStatusBar) {
@@ -455,6 +458,21 @@ public class AdMobAds extends CordovaPlugin implements IConnectivityChange {
             } else {
               params2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             }
+
+            if( customBannerSizeInPercent != null )
+              {
+
+                DisplayMetrics ds = DisplayInfo(AdMobAds.this.cordova.getActivity());
+
+                params2 = new RelativeLayout.LayoutParams(
+                  (int) Math.round(ds.widthPixels * customBannerSizeInPercent.width() / 100),
+                  (int) Math.round(ds.heightPixels * customBannerSizeInPercent.height() / 100)
+                );
+                params2.setMargins(
+                  (int) Math.round(ds.widthPixels * customBannerSizeInPercent.left / 100),
+                  (int) Math.round(ds.heightPixels * customBannerSizeInPercent.top / 100), 0, 0
+                );
+              }
 
             adViewLayout.addView(adView, params2);
             adViewLayout.bringToFront();
